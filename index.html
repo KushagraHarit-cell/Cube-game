@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <title>Login to the game</title>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-text">Loading...</div>
+        <div class="progress-container">
+            <div id="loaderProgress"></div>
+        </div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+    <div class="login-box" data-aos="fade-up" data-aos-duration="1000">
+        <form action="game.html">
+            <h2>Login</h2>
+            <div class="input-box">
+                <span class="icon"><ion-icon name="mail-outline"></ion-icon></span>
+                <input type="email" required>
+                <label>Email</label>
+            </div>
+            <div class="input-box">
+                <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+                <input type="password" required>
+                <label>Password</label>
+            </div>
+            <div class="remember-forgot">
+                <label><input type="checkbox"> Remember me</label>
+                <a href="#">Forgot password?</a>
+            </div>
+            <button id="button" type="submit">Login</button>
+            <div class="register-link">
+                <p>Don't have an account? 
+                    <a href="#">Register</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+        
+<script>
+    // Initialize AOS animation library
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init();
+        
+        // Loader animation
+        const loader = document.getElementById('loader');
+        const loaderProgress = document.getElementById('loaderProgress');
+        
+        let progress = 0;
+        const interval = setInterval(function() {
+            progress += 1;
+            loaderProgress.style.width = progress + '%';
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+                setTimeout(function() {
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }, 20);
+    });
+
+    // Initialize variables for particles
+    const particlesContainer = document.getElementById('particles');
+    let particles = [];
+    let matrixCodeElements = [];
+    
+    // Create different types of particles in the background
+    function createParticles() {
+        particlesContainer.innerHTML = '';
+        particles = [];
+        
+        // Create multiple types of particles
+        createParticleType('particle-dot', 30);
+        createParticleType('particle-line', 15);
+        createParticleType('particle-square', 20);
+        createParticleType('particle-ring', 10);
+        createParticleType('particle-pulse', 5);
+    }
+
+    function createParticleType(className, count) {
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            particle.className = `particle ${className}`;
+            
+            // Random position
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            // Random opacity
+            particle.style.opacity = 0.1 + Math.random() * 0.4;
+            
+            // For line particles, random rotation
+            if (className === 'particle-line') {
+                const rotation = Math.random() * 360;
+                particle.style.transform = `rotate(${rotation}deg)`;
+            }
+            
+            // Store particle data for animation
+            const particleData = {
+                element: particle,
+                x: x,
+                y: y,
+                speedX: (Math.random() - 0.5) * 0.5,
+                speedY: (Math.random() - 0.5) * 0.5,
+                type: className
+            };
+            
+            particles.push(particleData);
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    // Create Matrix-style falling code effect
+    function createMatrixCode() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$&+,:;=?@#|\'<>.^*()%!-';
+        const columns = Math.floor(window.innerWidth / 20);
+        
+        for (let i = 0; i < columns; i++) {
+            const matrixCode = document.createElement('div');
+            matrixCode.className = 'matrix-code';
+            
+            // Position at top of screen in a column
+            matrixCode.style.left = `${i * 20}px`;
+            matrixCode.style.top = `${Math.random() * -1000}px`;
+            
+            // Generate random characters
+            let text = '';
+            const length = 5 + Math.floor(Math.random() * 15);
+            for (let j = 0; j < length; j++) {
+                text += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            matrixCode.textContent = text;
+            
+            // Store for animation
+            matrixCodeElements.push({
+                element: matrixCode,
+                speed: 1 + Math.random() * 3,
+                y: parseInt(matrixCode.style.top)
+            });
+            
+            particlesContainer.appendChild(matrixCode);
+        }
+    }
+
+    // Animate all particles
+    function animateParticles() {
+        // Update regular particles
+        particles.forEach(particle => {
+            // Move particle
+            particle.x += particle.speedX;
+            particle.y += particle.speedY;
+            
+            // Wrap around screen
+            if (particle.x < -10) particle.x = window.innerWidth + 10;
+            if (particle.x > window.innerWidth + 10) particle.x = -10;
+            if (particle.y < -10) particle.y = window.innerHeight + 10;
+            if (particle.y > window.innerHeight + 10) particle.y = -10;
+            
+            // Update element position
+            particle.element.style.left = `${particle.x}px`;
+            particle.element.style.top = `${particle.y}px`;
+            
+            // Special effects for different particle types
+            if (particle.type === 'particle-ring') {
+                const scale = 0.5 + Math.sin(Date.now() * 0.001) * 0.5;
+                particle.element.style.transform = `scale(${scale})`;
+            }
+            
+            if (particle.type === 'particle-line') {
+                const rotation = parseFloat(particle.element.style.transform.replace('rotate(', '').replace('deg)', '')) + 0.2;
+                particle.element.style.transform = `rotate(${rotation}deg)`;
+            }
+        });
+        
+        // Update Matrix code
+        matrixCodeElements.forEach(code => {
+            code.y += code.speed;
+            code.element.style.top = `${code.y}px`;
+            
+            // Reset when it goes off screen
+            if (code.y > window.innerHeight) {
+                code.y = -100 - Math.random() * 300;
+                code.element.style.top = `${code.y}px`;
+                code.element.style.left = `${Math.random() * window.innerWidth}px`;
+                
+                // Regenerate text
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$&+,:;=?@#|\'<>.^*()%!-';
+                let text = '';
+                const length = 5 + Math.floor(Math.random() * 15);
+                for (let j = 0; j < length; j++) {
+                    text += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                code.element.textContent = text;
+            }
+        });
+        
+        // Continue animation loop
+        requestAnimationFrame(animateParticles);
+    }
+
+    // Initialize and start animations when page loads
+    window.addEventListener('load', () => {
+        createParticles();
+        createMatrixCode();
+        animateParticles();
+    });
+</script>
+</body>
+</html>
